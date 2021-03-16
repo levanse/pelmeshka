@@ -1,9 +1,11 @@
 <?php
 
+use common\models\Product;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\Product */
+/* @var $model Product */
+/* @var array $category */
 
 $this->title = Yii::t('app', 'Update Product: {name}', [
     'name' => $model->name,
@@ -18,6 +20,7 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 
     <?= $this->render('_form', [
         'model' => $model,
+        'category' => $category,
     ]) ?>
 
 </div>

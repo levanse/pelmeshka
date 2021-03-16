@@ -3,6 +3,9 @@
 namespace common\models;
 
 use Yii;
+use yii\db\ActiveRecord;
+use yii\helpers\VarDumper;
+use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "product".
@@ -21,8 +24,13 @@ use Yii;
  *
  * @property Category $category
  */
-class Product extends \yii\db\ActiveRecord
+class Product extends ActiveRecord
 {
+    /**
+     * @var UploadedFile
+     */
+    public $imageFile;
+
     /**
      * {@inheritdoc}
      */
@@ -42,6 +50,7 @@ class Product extends \yii\db\ActiveRecord
             [['price'], 'number'],
             [['name', 'meat', 'img', 'keywords', 'description'], 'string', 'max' => 256],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::className(), 'targetAttribute' => ['category_id' => 'id']],
+            [['imageFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg'],
         ];
     }
 
@@ -52,14 +61,14 @@ class Product extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'category_id' => Yii::t('app', 'Category ID'),
-            'name' => Yii::t('app', 'Name'),
-            'content' => Yii::t('app', 'Content'),
-            'price' => Yii::t('app', 'Price'),
-            'mass' => Yii::t('app', 'Mass'),
-            'percent' => Yii::t('app', 'Percent'),
-            'meat' => Yii::t('app', 'Meat'),
-            'img' => Yii::t('app', 'Img'),
+            'category_id' => Yii::t('app', 'Вид пельменей'),
+            'name' => Yii::t('app', 'Название'),
+            'content' => Yii::t('app', 'Описание'),
+            'price' => Yii::t('app', 'Цена'),
+            'mass' => Yii::t('app', 'Объем пачки'),
+            'percent' => Yii::t('app', 'Процент мяса'),
+            'meat' => Yii::t('app', 'Выбор мяса'),
+            'img' => Yii::t('app', 'Изображение'),
             'keywords' => Yii::t('app', 'Keywords'),
             'description' => Yii::t('app', 'Description'),
         ];
@@ -73,5 +82,18 @@ class Product extends \yii\db\ActiveRecord
     public function getCategory()
     {
         return $this->hasOne(Category::className(), ['id' => 'category_id']);
+    }
+
+    public function upload()
+    {
+        if ($this->validate()) {
+//            VarDumper::dump($this->imageFile, 10, 1);
+            $this->img = '/uploads/' . $this->imageFile->baseName . '.' . $this->imageFile->extension;
+            $this->save();
+            $this->imageFile->saveAs('uploads/' . $this->imageFile->baseName . '.' . $this->imageFile->extension);
+            return true;
+        } else {
+            return false;
+        }
     }
 }
